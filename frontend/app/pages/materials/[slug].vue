@@ -1,0 +1,9 @@
+<script setup lang="ts">
+import type { Material, Project, Paginated } from '~/types'
+const route = useRoute()
+const { data: material, error } = await useApi<Material>(`/materials/${route.params.slug}/`)
+if (error.value || !material.value) throw createError({ statusCode: error.value?.statusCode === 404 ? 404 : 503, statusMessage: 'Материал недоступен' })
+const { data: projects } = await useApi<Paginated<Project>>('/projects/', { query: { material: route.params.slug } })
+usePageSeo(() => material.value?.seo_title || `${material.value?.name} — материал для 3D-печати`, () => material.value?.seo_description || material.value?.description || '')
+</script>
+<template><div v-if="material"><section class="container section-pad"><Breadcrumbs :items="[{ label: 'Материалы', to: '/materials' }, { label: material.name }]" /><div class="page-heading"><span class="eyebrow">ИНЖЕНЕРНЫЕ ПЛАСТИКИ</span><h1>{{ material.name }}</h1><p>{{ material.description }}</p></div><div class="material-detail-grid"><article><span class="eyebrow">01 / ПРИМЕНЕНИЕ</span><h2>Где используется</h2><p>{{ material.applications }}</p></article><article><span class="eyebrow">02 / ПРЕИМУЩЕСТВА</span><h2>Почему выбирают</h2><p>{{ material.advantages }}</p></article><article><span class="eyebrow">03 / ОГРАНИЧЕНИЯ</span><h2>Что учесть</h2><p>{{ material.limitations }}</p></article><article><span class="eyebrow">04 / СВОЙСТВА</span><h2>Условия применения</h2><p>{{ material.properties }}</p></article></div></section><section v-if="projects?.results.length" class="portfolio-section section-pad"><div class="container"><h2>Примеры использования.</h2><div class="project-grid"><ProjectCard v-for="project in projects.results.slice(0, 3)" :key="project.id" :project="project" /></div></div></section><LeadForm /></div></template>

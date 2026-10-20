@@ -1,0 +1,6 @@
+<script setup lang="ts">
+import type { Material } from '~/types'
+const { data, error, refresh } = await useApi<Material[]>('/materials/')
+usePageSeo(() => 'Материалы для 3D-печати — инженерные пластики', () => 'PLA, PETG, ABS, ASA, PA6-CF, PA12-CF, PET-CF, PA-GF и PC. Возможности и ограничения материалов.')
+</script>
+<template><div><section class="container section-pad"><Breadcrumbs :items="[{ label: 'Материалы' }]" /><div class="page-heading"><span class="eyebrow">КАТАЛОГ МАТЕРИАЛОВ</span><h1>Свойства,<br>которые имеют значение.</h1><p>Материал выбирается под задачу. Рассказываем о применении и ограничениях инженерных пластиков.</p></div><ApiError v-if="error" :retry="refresh" /><div v-else class="material-grid"><NuxtLink v-for="(material, index) in data" :key="material.id" :to="`/materials/${material.slug}`" class="material-card"><span class="eyebrow">МАТЕРИАЛ / {{ String(index + 1).padStart(2, '0') }}</span><h2>{{ material.name }}<span>↗</span></h2><p>{{ material.description }}</p><div><small>ПРИМЕНЕНИЕ</small><p>{{ material.applications }}</p></div></NuxtLink></div><p class="material-disclaimer">Свойства зависят от марки материала, влажности, ориентации слоёв и режима печати. Для ответственных узлов требуются испытания.</p></section><LeadForm /></div></template>
